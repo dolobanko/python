@@ -12,29 +12,35 @@ pars.add_argument('-a', '--access', help="The access key for your AWS account.")
 pars.add_argument('-s', '--secret', help="The secret key for your AWS account.")
 pars.add_argument('-r', '--region', help="AWS region.")
 
-if len(sys.argv) < 3:
-        if not os.path.isfile(os.path.expanduser("~/.aws/credentials")):
-                print ('Can not detect AWS configuration file. Please, use "aws configure" or "--help"')
-                pars.print_help()
-                sys.exit(1)
-
 arg = vars(pars.parse_args())
 
-AWS_ACCESS_KEY_ID=arg['access']
-AWS_SECRET_ACCESS_KEY=arg['secret']
-os.environ ["AWS_DEFAULT_REGION"] = arg['region']
-
-as_client = boto3.client(
+if len(sys.argv) < 3:
+    if not os.path.isfile(os.path.expanduser("~/.aws/credentials")):
+        print ('Can not detect AWS configuration file. Please, use "aws configure" or "--help"')
+        pars.print_help()
+        sys.exit(1)
+    else:
+        as_client = boto3.client(
+        'autoscaling',
+        )
+        ec2_client = boto3.client(
+        'ec2',
+        )       
+else:
+    AWS_ACCESS_KEY_ID=arg['access']
+    AWS_SECRET_ACCESS_KEY=arg['secret']
+    os.environ ["AWS_DEFAULT_REGION"] = arg['region']
+    as_client = boto3.client(
     'autoscaling',
     aws_access_key_id=AWS_ACCESS_KEY_ID,
     aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-)
-
-ec2_client = boto3.client(
+    )
+    ec2_client = boto3.client(
     'ec2',
     aws_access_key_id=AWS_ACCESS_KEY_ID,
     aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-)
+    )
+
 
 def as_group():
         autoscalegroups = []
